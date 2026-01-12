@@ -17,7 +17,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        repository: digitalwitchdemo/main_bank_app_frontend
+        repository: Bank-Frontend-repo
         ref: main
 
 
@@ -52,26 +52,60 @@ jobs:
       run: rm -rf ./*
 
 
-  
   Continues-Update_k8s_manifest:
     runs-on: ubuntu-latest
     needs: Continues-Integration_build_and_push
+    env:
+      ECR_REGISTRY: 650891365688.dkr.ecr.us-east-1.amazonaws.com
+      ECR_REPOSITORY: bank-frontend
+      IMAGE_TAG: ${{ github.run_number }}
+
     steps:
-    - name: Checkout repository.
-      env:
-          GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
-          GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
-      run: |
-         git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/digitalwitchdemo/kubernetes-manifest.git
+      - name: Checkout Kubernetes repo
+        uses: actions/checkout@v4
+        with:
+          repository: victoria-cloud-AE/Kubernetes-repo
+          token: ${{ secrets.GIT_PASSWORD }}
+          path: kubernetes-repo
+
+      - name: Update frontend image in manifest
+        working-directory: kubernetes-repo
+        run: |
+          git config user.email "victoriaenuma@gmail.com"
+          git config user.name "victoria-cloud-AE"
+          
+          sed -i "s+${ECR_REGISTRY}/${ECR_REPOSITORY}:.*+${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}+g" ./bank-project/frontend.yaml
+
+          git add ./bank-project/frontend.yaml
+          git diff --cached --quiet || git commit -m "Update frontend image to version ${IMAGE_TAG}"
+          git push origin main      
+
+
+
+
+
+
+
+  
+  # Continues-Update_k8s_manifest:
+  #   runs-on: ubuntu-latest
+  #   needs: Continues-Integration_build_and_push
+  #   steps:
+  #   - name: Checkout repository.
+  #     env:
+  #         GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
+  #         GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+  #     run: |
+  #        git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/digitalwitchdemo/kubernetes-manifest.git
          
-         cd kubernetes-manifest
-         git config --global user.email "chukwunonsosmartagbawo@gmail.com"
-         git config --global user.name "smartcloud2023"
+  #        cd kubernetes-manifest
+  #        git config --global user.email "chukwunonsosmartagbawo@gmail.com"
+  #        git config --global user.name "smartcloud2023"
 
-         sed -i "s+${{ vars.ECR_REPO }}/bank-frontend:.*+${{ vars.ECR_REPO }}/bank-frontend:${{ github.run_number }}+g" ./bank-project/frontend.yaml
+  #        sed -i "s+${{ vars.ECR_REPO }}/bank-frontend:.*+${{ vars.ECR_REPO }}/bank-frontend:${{ github.run_number }}+g" ./bank-project/frontend.yaml
 
-         cat ./bank-project/frontend.yaml | grep -q "${{ vars.ECR_REPO }}/bank-frontend:${{ github.run_number }}"
+  #        cat ./bank-project/frontend.yaml | grep -q "${{ vars.ECR_REPO }}/bank-frontend:${{ github.run_number }}"
 
-         git add bank-project/frontend.yaml
-         git commit -m "Update frontend image to version ${{ github.run_number }}"
-         git push origin main
+  #        git add bank-project/frontend.yaml
+  #        git commit -m "Update frontend image to version ${{ github.run_number }}"
+  #        git push origin main
