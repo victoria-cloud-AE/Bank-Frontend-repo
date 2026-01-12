@@ -74,7 +74,7 @@ jobs:
           git config user.email "victoriaenuma@gmail.com"
           git config user.name "victoria-cloud-AE"
           
-          sed -i "s+${ECR_REGISTRY}/${ECR_REPOSITORY}:.*+${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}+g" ./bank-project/frontend.yaml
+          sed -i -E "s+(image: *\"?)${ECR_REGISTRY}/${ECR_REPOSITORY}:[^\"]+\+image: \"${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}+g" ./bank-project/frontend.yaml
 
           git add ./bank-project/frontend.yaml
           git diff --cached --quiet || git commit -m "Update frontend image to version ${IMAGE_TAG}"
