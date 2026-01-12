@@ -17,7 +17,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        repository: Bank-Frontend-repo
+        repository: victoria-cloud-AE/Bank-Frontend-repo
         ref: main
 
 
