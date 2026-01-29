@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend-banking-container
-        image: victoriacloud21stcentury/bank-frontend:v8-0ecd512
+        image: victoriacloud21stcentury/bank-frontend:v9-eec987a
         ports:
         - containerPort: 3000
         env:
