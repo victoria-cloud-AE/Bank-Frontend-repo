@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bank-enumavictoria-site-cert
+  namespace: default
+spec:
+  secretName: bank-enumavictoria-site
+  issuerRef:
+    name: http-01-production
+    kind: ClusterIssuer
+  commonName: bank.enumavictoria.site
+  dnsNames:
+  - bank.enumavictoria.site
+  - bankapi.enumavictoria.site
+  - grafana.enumavictoria.site
