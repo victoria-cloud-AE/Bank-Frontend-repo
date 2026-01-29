@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend-banking-container
-        image: 650891365688.dkr.ecr.us-east-1.amazonaws.com/bank-frontend:5
+        image: victoriacloud21stcentury/bank-frontend:v6-22037e2
         ports:
         - containerPort: 3000
         env:
