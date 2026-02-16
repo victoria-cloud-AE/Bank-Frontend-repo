@@ -1,18 +1,25 @@
-FROM node:18-alpine
+# 
 
+# Stage 1: Build React app
+FROM node:18-alpine AS builder
 
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
 
 COPY . .
 
-RUN npm install --save-dev @babel/plugin-proposal-private-property-in-object
-RUN npm install --save react react-dom @types/react @types/react-dom
-RUN npm install react-scripts@3.0.1  --save
-RUN npm install
+# Build the production bundle
+RUN npm run build
 
-# Attempt to fix vulnerabilities, but continue if it fails
-RUN npm audit fix --force || echo "Continuing despite npm audit fix failures"
+# Stage 2: Serve with Nginx
+FROM nginx:alpine
 
-EXPOSE 3000
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/build /usr/share/nginx/html
 
-ENV PORT 80
-CMD ["sh", "-c", "react-scripts start"]
+EXPOSE 8080
+
+CMD ["nginx", "-g", "daemon off;"]
