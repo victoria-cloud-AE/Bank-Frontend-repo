@@ -14,4 +14,5 @@ RUN npm audit fix --force || echo "Continuing despite npm audit fix failures"
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+ENV PORT 80
+CMD ["sh", "-c", "react-scripts start"]
